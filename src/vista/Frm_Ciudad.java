@@ -5,8 +5,12 @@
 package vista;
 
 import controlador.Ciudad.CiudadController;
+import controlador.tda.grafo.GrafoED;
+import controlador.tda.grafo.GrafoEND;
 import controlador.tda.lista.ListaEnlazada;
 import javax.swing.JOptionPane;
+import modelo.Ciudad;
+import vista.Grafo.Ejemplo.FmrVistaGrafo;
 import vista.ModeloTablas.ModeloTablaCiudad;
 
 /**
@@ -14,31 +18,36 @@ import vista.ModeloTablas.ModeloTablaCiudad;
  * @author Gigabyte
  */
 public class Frm_Ciudad extends javax.swing.JDialog {
-    private CiudadController cc;
+
+    private CiudadController cc = new CiudadController();
     private ModeloTablaCiudad mtc = new ModeloTablaCiudad();
+    private GrafoED gend = new GrafoED(0, Ciudad.class);
+
     /**
      * Creates new form Frm_Ciudad
      */
     public Frm_Ciudad(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-   
+
 //        Limpiar();
     }
+
     private void cargarTabla() {
-        mtc.setGrafo(cc.getGrafoEND());
+        mtc.setGrafo(cc.getGrafoED());
         mtc.fireTableStructureChanged();
         mtc.fireTableDataChanged();
         tblCiudad.setModel(mtc);
         tblCiudad.updateUI();
-       // System.out.println(cc.getGrafoEND().toString());
+        // System.out.println(cc.getGrafoEND().toString());
     }
-        private void Limpiar() {
+
+    private void Limpiar() {
         txtLatitud.setText("");
         txtLongitud.setText("");
         txtNombre.setText("");
         txtDescripcion.setText("");
-        String [] aux = {""};
+        String[] aux = {""};
         ListCaminoMinimo.setListData(aux);
         ListDijkstra.setListData(aux);
         cc.setCiudad(null);
@@ -46,20 +55,128 @@ public class Frm_Ciudad extends javax.swing.JDialog {
         cargarTabla();
 
     }
-         private void crear() {
 
-        Integer nro = Integer.parseInt(cbxnro.getSelectedItem().toString());
-        cc = new CiudadController(nro);
-        jPanel2.setVisible(true);
-        jPanel4.setVisible(true);
-        jPanel5.setVisible(true);
-        String[] aux = {""};
-       ListCaminoMinimo.setListData(aux);
-       ListDijkstra.setListData(aux);
-        btnModificar.setEnabled(false);
-        
-        cargarTabla();
+    public void CrearCiudad() {
+        String nombre = txtNombre.getText();
+        String des = txtDescripcion.getText();
+        Double lat = Double.parseDouble(txtLatitud.getText());
+        Double longi = Double.parseDouble(txtLongitud.getText());
+        GrafoED nuevo = gend;
+        gend = new GrafoEND<>(nuevo.numVertices() + 1, Ciudad.class);
+        try {
+            for (int i = 1; i <= nuevo.numVertices(); i++) {
+
+                gend.etiquetarVertice(i, nuevo.obtenerEtiqueta(i));
+
+            }
+            for (int i = 1; i <= nuevo.numVertices(); i++) {
+                for (int j = 0; j < nuevo.adyacentes(i).getSize(); j++) {
+                    gend.insertarArista(nuevo.obtenerEtiqueta(i), nuevo.obtenerEtiqueta(nuevo.adyacentes(i).obtenerDato(j).getDestino()), (Double) nuevo.existeArista(nuevo.obtenerEtiqueta(i), nuevo.obtenerEtiqueta(nuevo.adyacentes(i).obtenerDato(j).getDestino()))[1]);
+                }
+            }
+            gend.etiquetarVertice(gend.numVertices(), txtNombre.getText());
+            Limpiar();
+        } catch (Exception e) {
+        }
         cargarcbxVertices();
+        cargarTabla();
+
+    }
+
+//    private void crear() {
+//
+////        Integer nro = Integer.parseInt(cbxnro.getSelectedItem().toString());
+//        Integer numV = Integer.parseInt(jspinnerNro.getValue().toString());
+//        cc = new CiudadController(numV);
+//        gend = cc.getGrafoEND();
+//        
+//        jPanel2.setVisible(true);
+//        jPanel4.setVisible(true);
+//        jPanel5.setVisible(true);
+//        String[] aux = {""};
+//        ListCaminoMinimo.setListData(aux);
+//        ListDijkstra.setListData(aux);
+//        btnModificar.setEnabled(false);
+//
+//         mtc.setGrafo(gend);
+//        mtc.fireTableStructureChanged();
+//        mtc.fireTableDataChanged();
+//        tblCiudad.setModel(mtc);
+//        tblCiudad.updateUI();
+//        cargarcbxVertices();
+//    }
+    private void crear() {
+        Integer numV = Integer.parseInt(jspinnerNro.getValue().toString());
+        cc = new CiudadController(numV);
+//        Integer nro = Integer.parseInt(cbxnro.getSelectedItem().toString());
+        
+        if (gend.numVertices()==0) {
+            
+
+            gend = cc.getGrafoED();
+
+            System.out.println(cc.getGrafoED().toString());
+            GrafoED nuevo = gend;
+            gend = new GrafoEND(nuevo.numVertices() + (numV - nuevo.numVertices()), Ciudad.class);
+            try {
+                for (int i = 1; i <= nuevo.numVertices(); i++) {
+
+                    gend.etiquetarVertice(i, nuevo.obtenerEtiqueta(i));
+
+                }
+                for (int i = 1; i <= nuevo.numVertices(); i++) {
+                    for (int j = 0; j < nuevo.adyacentes(i).getSize(); j++) {
+                        gend.insertarArista(nuevo.obtenerEtiqueta(i), nuevo.obtenerEtiqueta(nuevo.adyacentes(i).obtenerDato(j).getDestino()), (Double) nuevo.existeArista(nuevo.obtenerEtiqueta(i), nuevo.obtenerEtiqueta(nuevo.adyacentes(i).obtenerDato(j).getDestino()))[1]);
+                    }
+                }
+                gend.etiquetarVertice(gend.numVertices(), txtNombre.getText());
+                Limpiar();
+            } catch (Exception e) {
+            }
+        } else if(gend.numVertices() != 0) {
+            
+            gend = cc.getGrafoED();
+
+            System.out.println(cc.getGrafoED().toString());
+            GrafoED nuevo = gend;
+            gend = new GrafoEND(nuevo.numVertices() + (numV - nuevo.numVertices()), Ciudad.class);
+            try {
+                for (int i = 1; i <= nuevo.numVertices(); i++) {
+
+                    gend.etiquetarVertice(i, nuevo.obtenerEtiqueta(i));
+
+                }
+                for (int i = 1; i <= nuevo.numVertices(); i++) {
+                    for (int j = 0; j < nuevo.adyacentes(i).getSize(); j++) {
+                        gend.insertarArista(nuevo.obtenerEtiqueta(i), nuevo.obtenerEtiqueta(nuevo.adyacentes(i).obtenerDato(j).getDestino()), (Double) nuevo.existeArista(nuevo.obtenerEtiqueta(i), nuevo.obtenerEtiqueta(nuevo.adyacentes(i).obtenerDato(j).getDestino()))[1]);
+                    }
+                }
+                gend.etiquetarVertice(gend.numVertices(), txtNombre.getText());
+                Limpiar();
+            } catch (Exception e) {
+            }
+
+        }
+        String[] aux = {""};
+        ListCaminoMinimo.setListData(aux);
+        ListDijkstra.setListData(aux);
+        btnModificar.setEnabled(false);
+
+        mtc.setGrafo(gend);
+        mtc.fireTableStructureChanged();
+        mtc.fireTableDataChanged();
+        tblCiudad.setModel(mtc);
+        tblCiudad.updateUI();
+
+        cbxdestino.removeAllItems();
+        cbxorigen.removeAllItems();
+        try {
+            for (int i = 1; i <= gend.numVertices(); i++) {
+                cbxorigen.addItem(gend.obtenerEtiqueta(i).toString());
+                cbxdestino.addItem(gend.obtenerEtiqueta(i).toString());
+            }
+        } catch (Exception e) {
+        }
     }
 //    private void guardar(){
 //        if (camposValidos()) {
@@ -76,56 +193,60 @@ public class Frm_Ciudad extends javax.swing.JDialog {
 //        JOptionPane.showMessageDialog(null, "Llene los campos vacios", "Advertencia", JOptionPane.ERROR_MESSAGE);
 //        }      
 //    }
-     private void modificar() throws Exception {
+
+    private void modificar() throws Exception {
         if (!camposValidos()) {
             JOptionPane.showMessageDialog(null, "Campos vacios", "Advertencia", JOptionPane.ERROR_MESSAGE);
 
         } else {
             try {
-                Integer pos = cc.getGrafoEND().obtenerCodigo(cc.getCiudad());
+                Integer pos = cc.getGrafoED().obtenerCodigo(cc.getCiudad());
                 cc.getCiudad().setNomCiudad(txtNombre.getText());
                 cc.getCiudad().setDescripcion(txtDescripcion.getText().trim());
                 cc.getCiudad().getUbicacion().setLatitud(Double.parseDouble(txtLatitud.getText()));
                 cc.getCiudad().getUbicacion().setLongitud(Double.parseDouble(txtLongitud.getText()));
-                if (cc.modificar(pos)&&cc.getGrafoEND().modificar(cc.getGrafoEND().obtenerEtiqueta(pos), cc.getCiudad())) {                   
+                if (cc.modificar(pos) && cc.getGrafoED().modificar(cc.getGrafoED().obtenerEtiqueta(pos), cc.getCiudad())) {
+                    System.out.println(cc.getGrafoED().toString());
                     cargarcbxVertices();
                     Limpiar();
                     JOptionPane.showMessageDialog(null, "Datos Modificados", "Exito", JOptionPane.INFORMATION_MESSAGE);
                 } else {
                     JOptionPane.showMessageDialog(null, "No se pudo Modificar", "Advertencia", JOptionPane.ERROR_MESSAGE);
                 }
-                
-                
+
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(null, "Error", "Advertencia", JOptionPane.ERROR_MESSAGE);
             }
         }
 
     }
-     private void cargarcbxVertices() {
+
+    private void cargarcbxVertices() {
         cbxdestino.removeAllItems();
         cbxorigen.removeAllItems();
         try {
-            for (int i = 1; i <= cc.getGrafoEND().numVertices(); i++) {
-                cbxorigen.addItem(cc.getGrafoEND().obtenerEtiqueta(i).toString());
-                cbxdestino.addItem(cc.getGrafoEND().obtenerEtiqueta(i).toString());
+            for (int i = 1; i <= cc.getGrafoED().numVertices(); i++) {
+                cbxorigen.addItem(cc.getGrafoED().obtenerEtiqueta(i).toString());
+                cbxdestino.addItem(cc.getGrafoED().obtenerEtiqueta(i).toString());
             }
         } catch (Exception e) {
         }
 
     }
-    private boolean camposValidos(){
-        if (txtDescripcion.getText().trim().isEmpty()||
-                txtNombre.getText().trim().isEmpty()||
-                txtLatitud.getText().trim().isEmpty()|| 
-                txtLongitud.getText().trim().isEmpty()) {
+
+    private boolean camposValidos() {
+        if (txtDescripcion.getText().trim().isEmpty()
+                || txtNombre.getText().trim().isEmpty()
+                || txtLatitud.getText().trim().isEmpty()
+                || txtLongitud.getText().trim().isEmpty()) {
             return false;
-            
+
         }
-    
-    return true;
-    
+
+        return true;
+
     }
+
     private void cargarDatos() {
         btnModificar.setEnabled(true);
         Integer fila = -1;
@@ -133,11 +254,11 @@ public class Frm_Ciudad extends javax.swing.JDialog {
         try {
 
             if (fila >= 0) {
-                cc.setCiudad(cc.getGrafoEND().obtenerEtiqueta(fila + 1));
+                cc.setCiudad(cc.getGrafoED().obtenerEtiqueta(fila + 1));
                 txtDescripcion.setText(String.valueOf(cc.getCiudad().getDescripcion().trim()));
                 txtLatitud.setText(String.valueOf(cc.getCiudad().getUbicacion().getLatitud()));
                 txtLongitud.setText(String.valueOf(cc.getCiudad().getUbicacion().getLongitud()));
-                
+
 //               btnGenerar.setEnabled(false);
             } else {
                 JOptionPane.showMessageDialog(null, "Elija una fila", "Advertencia", JOptionPane.ERROR_MESSAGE);
@@ -146,15 +267,16 @@ public class Frm_Ciudad extends javax.swing.JDialog {
         }
 
     }
-     private void adyacencia() {
+
+    private void adyacencia() {
         Integer origen = (cbxorigen.getSelectedIndex() + 1);
         Integer destino = (cbxdestino.getSelectedIndex() + 1);
         if (origen == destino) {
             JOptionPane.showMessageDialog(null, "Escoja una ciudad diferente", "Advertencia", JOptionPane.ERROR_MESSAGE);
         } else {
             try {
-                Double distancia = cc.calcularDistancia(cc.getGrafoEND().obtenerEtiqueta(origen), cc.getGrafoEND().obtenerEtiqueta(destino));
-                cc.getGrafoEND().insertarArista(cc.getGrafoEND().obtenerEtiqueta(origen), cc.getGrafoEND().obtenerEtiqueta(destino), distancia);
+                Double distancia = cc.calcularDistancia(cc.getGrafoED().obtenerEtiqueta(origen), cc.getGrafoED().obtenerEtiqueta(destino));
+                cc.getGrafoED().insertarArista(cc.getGrafoED().obtenerEtiqueta(origen), cc.getGrafoED().obtenerEtiqueta(destino), distancia);
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(null, e.toString(), "Advertencia", JOptionPane.ERROR_MESSAGE);
             }
@@ -162,29 +284,32 @@ public class Frm_Ciudad extends javax.swing.JDialog {
         }
 
     }
-    private void camino(){
-    String[] aux = {""};
-       ListCaminoMinimo.setListData(aux);
-     Integer origen = (cbxorigen.getSelectedIndex() + 1);
+
+    private void camino() {
+        String[] aux = {""};
+        ListCaminoMinimo.setListData(aux);
+        Integer origen = (cbxorigen.getSelectedIndex() + 1);
         Integer destino = (cbxdestino.getSelectedIndex() + 1);
         if (origen == destino) {
             JOptionPane.showMessageDialog(null, "Escoja una ciudad diferente", "Advertencia", JOptionPane.ERROR_MESSAGE);
         } else {
             try {
-                ListaEnlazada<Integer> lista = cc.getGrafoEND().caminoMinimo(origen, destino);
+                ListaEnlazada<Integer> lista = cc.getGrafoED().caminoMinimo(origen, destino);
                 aux = new String[lista.getSize()];
                 for (int i = 0; i < lista.getSize(); i++) {
-                    aux[i]= cc.getGrafoEND().obtenerEtiqueta(lista.obtenerDato(i)).toString();
+                    aux[i] = cc.getGrafoED().obtenerEtiqueta(lista.obtenerDato(i)).toString();
                 }
                 ListCaminoMinimo.setListData(aux);
-               
+
             } catch (Exception e) {
-                JOptionPane.showMessageDialog(null,e.toString(), "ERROR", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, e.toString(), "ERROR", JOptionPane.ERROR_MESSAGE);
             }
 
         }
-    
+
     }
+   
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -209,6 +334,7 @@ public class Frm_Ciudad extends javax.swing.JDialog {
         btnModificar = new javax.swing.JButton();
         cbxnro = new javax.swing.JComboBox<>();
         btnGenerar = new javax.swing.JButton();
+        jspinnerNro = new javax.swing.JSpinner();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         tblCiudad = new javax.swing.JTable();
@@ -218,6 +344,7 @@ public class Frm_Ciudad extends javax.swing.JDialog {
         jLabel7 = new javax.swing.JLabel();
         cbxdestino = new javax.swing.JComboBox<>();
         btnVincular = new javax.swing.JButton();
+        btnPresentar = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         ListCaminoMinimo = new javax.swing.JList<>();
@@ -293,6 +420,10 @@ public class Frm_Ciudad extends javax.swing.JDialog {
         jPanel2.add(btnGenerar);
         btnGenerar.setBounds(180, 10, 100, 30);
 
+        jspinnerNro.setModel(new javax.swing.SpinnerNumberModel(4, 4, null, 1));
+        jPanel2.add(jspinnerNro);
+        jspinnerNro.setBounds(290, 10, 70, 30);
+
         jPanel1.add(jPanel2);
         jPanel2.setBounds(10, 10, 680, 190);
 
@@ -328,19 +459,19 @@ public class Frm_Ciudad extends javax.swing.JDialog {
 
         jLabel6.setText("Origen");
         jPanel4.add(jLabel6);
-        jLabel6.setBounds(50, 30, 60, 30);
+        jLabel6.setBounds(20, 30, 60, 30);
 
         cbxorigen.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jPanel4.add(cbxorigen);
-        cbxorigen.setBounds(120, 30, 110, 30);
+        cbxorigen.setBounds(90, 30, 110, 30);
 
         jLabel7.setText("Destino");
         jPanel4.add(jLabel7);
-        jLabel7.setBounds(250, 30, 70, 30);
+        jLabel7.setBounds(220, 30, 70, 30);
 
         cbxdestino.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jPanel4.add(cbxdestino);
-        cbxdestino.setBounds(330, 30, 110, 30);
+        cbxdestino.setBounds(300, 30, 110, 30);
 
         btnVincular.setText("VINCULAR");
         btnVincular.addActionListener(new java.awt.event.ActionListener() {
@@ -349,7 +480,16 @@ public class Frm_Ciudad extends javax.swing.JDialog {
             }
         });
         jPanel4.add(btnVincular);
-        btnVincular.setBounds(510, 30, 110, 30);
+        btnVincular.setBounds(430, 30, 110, 30);
+
+        btnPresentar.setText("Presentar");
+        btnPresentar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPresentarActionPerformed(evt);
+            }
+        });
+        jPanel4.add(btnPresentar);
+        btnPresentar.setBounds(560, 30, 90, 30);
 
         jPanel1.add(jPanel4);
         jPanel4.setBounds(10, 520, 680, 80);
@@ -405,6 +545,11 @@ public class Frm_Ciudad extends javax.swing.JDialog {
         jScrollPane4.setViewportView(ListDijkstra);
 
         btnDijkstra.setText("Camino");
+        btnDijkstra.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDijkstraActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
@@ -475,14 +620,22 @@ public class Frm_Ciudad extends javax.swing.JDialog {
         // TODO add your handling code here:
         try {
             crear();
-            if (cc.guardar()) {
-                JOptionPane.showMessageDialog(null, "Ciudades Generadas", "Exito", JOptionPane.INFORMATION_MESSAGE);
-            }else{
-            JOptionPane.showMessageDialog(null, "No se pudo generar las Ciudades", "Advertencia", JOptionPane.ERROR_MESSAGE);
-            }
+            
         } catch (Exception e) {
         }
     }//GEN-LAST:event_btnGenerarActionPerformed
+
+    private void btnPresentarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPresentarActionPerformed
+        // TODO add your handling code here:
+        FmrVistaGrafo frm = new FmrVistaGrafo(gend);
+        frm.setSize(400, 400);
+        frm.setVisible(true);
+    }//GEN-LAST:event_btnPresentarActionPerformed
+
+    private void btnDijkstraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDijkstraActionPerformed
+        // TODO add your handling code here:
+        
+    }//GEN-LAST:event_btnDijkstraActionPerformed
 
     /**
      * @param args the command line arguments
@@ -533,6 +686,7 @@ public class Frm_Ciudad extends javax.swing.JDialog {
     private javax.swing.JButton btnDijkstra;
     private javax.swing.JButton btnGenerar;
     private javax.swing.JButton btnModificar;
+    private javax.swing.JButton btnPresentar;
     private javax.swing.JButton btnVincular;
     private javax.swing.JComboBox<String> cbxdestino;
     private javax.swing.JComboBox<String> cbxnro;
@@ -554,6 +708,7 @@ public class Frm_Ciudad extends javax.swing.JDialog {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JSpinner jspinnerNro;
     private javax.swing.JTable tblCiudad;
     private javax.swing.JTextArea txtDescripcion;
     private javax.swing.JTextField txtLatitud;

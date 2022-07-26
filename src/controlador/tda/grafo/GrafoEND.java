@@ -1,6 +1,8 @@
 package controlador.tda.grafo;
 
+import controlador.tda.grafo.exception.GrafoConnectionException;
 import controlador.tda.grafo.exception.VerticeException;
+import controlador.tda.lista.ListaEnlazada;
 
 /*
  * To change this license header, choose License Headers in Project Properties.

@@ -5,7 +5,7 @@
  */
 package vista.ModeloTablas;
 
-import controlador.tda.grafo.GrafoEND;
+import controlador.tda.grafo.GrafoED;
 import javax.swing.table.AbstractTableModel;
 import modelo.Ciudad;
 
@@ -15,13 +15,13 @@ import modelo.Ciudad;
  */
 public class ModeloTablaCiudad extends AbstractTableModel {
 
-    private GrafoEND<Ciudad> grafo;
+    private GrafoED<Ciudad> grafo;
 
-    public GrafoEND<Ciudad> getGrafo() {
+    public GrafoED<Ciudad> getGrafo() {
         return grafo;
     }
 
-    public void setGrafo(GrafoEND<Ciudad> grafo) {
+    public void setGrafo(GrafoED<Ciudad> grafo) {
         this.grafo = grafo;
     }
 

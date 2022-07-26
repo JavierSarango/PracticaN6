@@ -133,40 +133,5 @@ public abstract class Grafo {
         return camino;
     }
 
-    public ListaEnlazada Dijkstra(GrafoD grafo, Integer origen)throws Exception  {
-  ListaEnlazada<Integer> camino = new ListaEnlazada<>();    
-  Integer n = grafo.numVertices();
-        if (estaConectado()) {
-            ListaEnlazada pesos = new ListaEnlazada();
-            Boolean finalizar = false;
-            Boolean[] F = new Boolean[n];
-            Integer inicial = origen;
-            camino.insertarCabecera(inicial);
-            while (!finalizar) {
-                ListaEnlazada<Adyacencia> adyacencias = adyacentes(origen);
-                Integer T = -1;
-                Double peso = 1000000000.0;
-                for (int i = 0; i < adyacencias.getSize(); i++) {
-                    Adyacencia ad = adyacencias.obtenerDato(i);
-                    for (int j = 0; j < n; j++) {
-                        F[i]= false;
-                        
-                    }
-
-                }
-                if (T > -1) {
-                    pesos.insertarCabecera(peso);
-                    camino.insertarCabecera(T);
-                    inicial = T;
-                } else {
-                    throw new GrafoConnectionException("No se encuentra el camino");
-                }
-//                if (verticeFinal.intValue() == inicial.intValue()) {
-//                    finalizar = true;
-//                }
-
-            }
-        }
-        return camino;
-    }
+    
 }

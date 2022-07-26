@@ -1,7 +1,9 @@
 package controlador.Ciudad;
 
 import controlador.DAO.AdaptadorDao;
+import controlador.tda.grafo.GrafoED;
 import controlador.tda.grafo.GrafoEND;
+import controlador.tda.lista.ListaEnlazada;
 import controlador.tda.lista.ListaEnlazadaServices;
 import modelo.Ciudad;
 import modelo.Ubicacion;
@@ -13,14 +15,21 @@ import modelo.Ubicacion;
 public class CiudadController extends AdaptadorDao<Ciudad> {
 
     private Ciudad ciudad;
-    private GrafoEND<Ciudad> grafoEND;
+    private GrafoED grafoED = new GrafoED<>(0, Ciudad.class);
     private ListaEnlazadaServices<Ciudad> listaCiudad;   
+ 
 
+    public CiudadController() {
+        super(Ciudad.class);
+                
+    }
+    
+   
 
     public CiudadController(Integer numV) {
         super(Ciudad.class);
-        grafoEND = new GrafoEND<>(numV, Ciudad.class);
-        for (int i = 0; i <= numV; i++) {
+        grafoED = new GrafoEND<>(numV, Ciudad.class);
+        for (int i = 1; i <= numV; i++) {
             Ciudad c = new Ciudad();
             c.setId(i);
             c.setNomCiudad("Ciudad " + i);
@@ -30,12 +39,17 @@ public class CiudadController extends AdaptadorDao<Ciudad> {
             ubicacion.setLongitud(0.0);
             ubicacion.setLatitud(0.0);
             c.setUbicacion(ubicacion);
-            grafoEND.etiquetarVertice(i, c);
+            grafoED.etiquetarVertice(i, c);            
             
         }
-        
         listado();
+        
     }
+    public GrafoED temp(){
+        GrafoED aux = grafoED;
+    return aux;
+    }
+    
 
     public Ciudad getCiudad() {
         if (ciudad == null) {
@@ -48,12 +62,12 @@ public class CiudadController extends AdaptadorDao<Ciudad> {
         this.ciudad = ciudad;
     }
 
-    public GrafoEND<Ciudad> getGrafoEND() {
-        return grafoEND;
+    public GrafoED<Ciudad> getGrafoED() {
+        return grafoED;
     }
 
-    public void setGrafoEND(GrafoEND<Ciudad> grafoEND) {
-        this.grafoEND = grafoEND;
+    public void setGrafoED(GrafoED<Ciudad> grafoED) {
+        this.grafoED = grafoED;
     }
 
     public ListaEnlazadaServices<Ciudad> getListaCiudad() {
