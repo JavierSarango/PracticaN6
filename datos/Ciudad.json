@@ -1,0 +1,1 @@
+{"lista":{"cabecera":{"dato":{"@class":"modelo.Ciudad","id":1},"siguiente":{"dato":{"@class":"modelo.Ciudad","id":2},"siguiente":{"dato":{"@class":"modelo.Ciudad","id":3}}}},"size":3}}
